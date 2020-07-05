@@ -28,27 +28,33 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import javax.annotation.Resource;
+
 /**
  * @author Tijs Rademakers
  */
+
 @RestController
 @RequestMapping("/service")
 public class ModelEditorJsonRestResource implements ModelDataJsonConstants {
-  
+
   protected static final Logger LOGGER = LoggerFactory.getLogger(ModelEditorJsonRestResource.class);
-  
-  @Autowired
+
+  @Resource
   private RepositoryService repositoryService;
-  
-  @Autowired
+
+  @Resource
   private ObjectMapper objectMapper;
-  
+  /**
+   * 获取流程json信息
+   * @param modelId
+   * @return
+   */
+  @SuppressWarnings("deprecation")
   @RequestMapping(value="/model/{modelId}/json", method = RequestMethod.GET, produces = "application/json")
   public ObjectNode getEditorJson(@PathVariable String modelId) {
     ObjectNode modelNode = null;
-    
     Model model = repositoryService.getModel(modelId);
-      
     if (model != null) {
       try {
         if (StringUtils.isNotEmpty(model.getMetaInfo())) {
@@ -59,9 +65,8 @@ public class ModelEditorJsonRestResource implements ModelDataJsonConstants {
         }
         modelNode.put(MODEL_ID, model.getId());
         ObjectNode editorJsonNode = (ObjectNode) objectMapper.readTree(
-            new String(repositoryService.getModelEditorSource(model.getId()), "utf-8"));
+                new String(repositoryService.getModelEditorSource(model.getId()), "utf-8"));
         modelNode.put("model", editorJsonNode);
-        
       } catch (Exception e) {
         LOGGER.error("Error creating model JSON", e);
         throw new ActivitiException("Error creating model JSON", e);

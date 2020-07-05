@@ -184,6 +184,8 @@ public class ModelerController {
     	Map<String, String> map = new HashMap<String, String>();
 		Model modelData = repositoryService.getModel(modelId);
 		if(null != modelData){
+		    //删除流程模型
+			repositoryService.deleteModel(modelId);
 			try {
 			   ProcessInstance pi = runtimeService.createProcessInstanceQuery().processDefinitionKey(modelData.getKey()).singleResult();
 			   if(null != pi) {
